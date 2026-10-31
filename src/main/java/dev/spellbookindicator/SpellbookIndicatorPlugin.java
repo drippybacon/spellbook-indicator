@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2026, Spellbook Indicator contributors
+ * Copyright (c) 2026, Interface Hotkey Guard contributors
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package dev.spellbookindicator;
 
 import com.google.inject.Provides;
@@ -17,8 +43,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 )
 public class SpellbookIndicatorPlugin extends Plugin
 {
-	private static final String CONFIG_GROUP = "spellbookindicator";
-
 	@Inject
 	private Client client;
 
@@ -55,19 +79,19 @@ public class SpellbookIndicatorPlugin extends Plugin
 
 	private static void migrateVisibility(ConfigManager configManager, String oldKey, String newKey)
 	{
-		String legacyValue = configManager.getConfiguration(CONFIG_GROUP, oldKey);
+		String legacyValue = configManager.getConfiguration(SpellbookIndicatorConfig.GROUP, oldKey);
 		if (legacyValue == null)
 		{
 			return;
 		}
-		if (configManager.getConfiguration(CONFIG_GROUP, newKey) == null
+		if (configManager.getConfiguration(SpellbookIndicatorConfig.GROUP, newKey) == null
 			&& ("true".equals(legacyValue) || "false".equals(legacyValue)))
 		{
 			SpellbookVisibility visibility = Boolean.parseBoolean(legacyValue)
 				? SpellbookVisibility.EVERYWHERE : SpellbookVisibility.OFF;
-			configManager.setConfiguration(CONFIG_GROUP, newKey, visibility);
+			configManager.setConfiguration(SpellbookIndicatorConfig.GROUP, newKey, visibility);
 		}
-		configManager.unsetConfiguration(CONFIG_GROUP, oldKey);
+		configManager.unsetConfiguration(SpellbookIndicatorConfig.GROUP, oldKey);
 	}
 
 	int getCurrentSpellbook()

@@ -51,6 +51,8 @@ Use RuneLite's overlay modifier, **Alt** by default:
 
 The icon and name can be positioned and resized separately. The name initially uses RuneLite's interface font; resizing it adjusts the text size.
 
+Very small name boxes keep a readable minimum font size and shorten the name with `...` when needed. Text is clipped to the resized box, so switching spellbooks keeps its saved dimensions.
+
 ## Scope
 
 The plugin displays spellbook status in standalone overlays. It does not cast spells, change game interfaces or their click targets, or make external network requests. Settings are stored through RuneLite's configuration system.
@@ -58,3 +60,5 @@ The plugin displays spellbook status in standalone overlays. It does not cast sp
 ## License
 
 [BSD 2-Clause](LICENSE).
+
+The existing Interface Hotkey Guard contributors notice is retained from the repository's original license.

@@ -31,9 +31,6 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('jar') {
 	from('runelite-plugin.properties')
-	from('LICENSE') {
-		into 'META-INF'
-	}
 }
 
 tasks.register('run', JavaExec) {
