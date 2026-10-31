@@ -19,7 +19,6 @@ dependencies {
 	compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name: 'jshell', version: runeLiteVersion
-	testImplementation 'junit:junit:4.13.2'
 }
 
 group = 'dev.spellbookindicator'
@@ -30,12 +29,11 @@ tasks.withType(JavaCompile).configureEach {
 	options.release.set(11)
 }
 
-tasks.withType(Test).configureEach {
-	useJUnit()
-}
-
 tasks.named('jar') {
 	from('runelite-plugin.properties')
+	from('LICENSE') {
+		into 'META-INF'
+	}
 }
 
 tasks.register('run', JavaExec) {

@@ -2,21 +2,24 @@ package dev.spellbookindicator;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import javax.inject.Inject;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayMenuEntry;
-import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.LayoutableRenderableEntity;
 import net.runelite.client.ui.overlay.components.TextComponent;
 
 import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
 import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
 
-public class SpellbookNameOverlay extends OverlayPanel
+public class SpellbookNameOverlay extends Overlay
 {
+	private static final float MIN_FONT_SIZE = 8f;
+	private static final float MAX_FONT_SIZE = 128f;
+
 	private final SpellbookIndicatorConfig config;
 	private final SpellbookIndicatorPlugin plugin;
 
@@ -27,9 +30,11 @@ public class SpellbookNameOverlay extends OverlayPanel
 		this.config = config;
 		this.plugin = plugin;
 
-		// Keep the name separate from the icon by default. Both overlays can be moved independently.
 		setPosition(OverlayPosition.TOP_LEFT);
+		setLayer(OverlayLayer.ABOVE_WIDGETS);
 		setMovable(true);
+		setResizable(true);
+		setMinimumSize(16);
 		getMenuEntries().add(new OverlayMenuEntry(
 			RUNELITE_OVERLAY_CONFIG,
 			OPTION_CONFIGURE,
@@ -39,64 +44,52 @@ public class SpellbookNameOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!config.showName())
+		if (!config.nameVisibility().isVisible(plugin.isBankOpen()))
 		{
 			return null;
 		}
 
 		int spellbook = plugin.getCurrentSpellbook();
-		panelComponent.getChildren().add(new SpellbookNameComponent(
-			getName(spellbook),
-			getColor(spellbook)));
-		return super.render(graphics);
-	}
-
-	private static final class SpellbookNameComponent implements LayoutableRenderableEntity
-	{
-		private final String text;
-		private final Color color;
-		private final Rectangle bounds = new Rectangle();
-		private Point preferredLocation = new Point();
-
-		private SpellbookNameComponent(String text, Color color)
+		String name = getName(spellbook);
+		if (name == null)
 		{
-			this.text = text;
-			this.color = color;
+			return null;
 		}
 
-		@Override
-		public Dimension render(Graphics2D graphics)
+		Graphics2D textGraphics = (Graphics2D) graphics.create();
+		try
 		{
-			java.awt.FontMetrics metrics = graphics.getFontMetrics();
-			TextComponent textComponent = new TextComponent();
-			textComponent.setPosition(
-				preferredLocation.x,
-				preferredLocation.y + metrics.getAscent());
-			textComponent.setText(text);
-			textComponent.setColor(color);
-			textComponent.render(graphics);
+			Dimension preferredSize = getPreferredSize();
+			if (preferredSize != null)
+			{
+				Font font = textGraphics.getFont();
+				FontMetrics metrics = textGraphics.getFontMetrics();
+				double scale = Math.min(
+					(double) Math.max(getMinimumSize(), preferredSize.width) / (metrics.stringWidth(name) + 1),
+					(double) Math.max(getMinimumSize(), preferredSize.height) / (metrics.getHeight() + 1));
+				float fontSize = (float) (font.getSize2D() * scale);
+				textGraphics.setFont(font.deriveFont(Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, fontSize))));
+			}
 
-			Dimension dimension = new Dimension(metrics.stringWidth(text), metrics.getHeight());
-			bounds.setBounds(preferredLocation.x, preferredLocation.y, dimension.width, dimension.height);
-			return dimension;
+			FontMetrics metrics = textGraphics.getFontMetrics();
+			TextComponent text = new TextComponent();
+			text.setText(name);
+			text.setColor(getColor(spellbook));
+			text.setPosition(0, metrics.getAscent());
+			text.render(textGraphics);
+
+			int width = metrics.stringWidth(name) + 1;
+			int height = metrics.getHeight() + 1;
+			if (preferredSize != null)
+			{
+				width = Math.max(width, preferredSize.width);
+				height = Math.max(height, preferredSize.height);
+			}
+			return new Dimension(width, height);
 		}
-
-		@Override
-		public Rectangle getBounds()
+		finally
 		{
-			return bounds;
-		}
-
-		@Override
-		public void setPreferredLocation(Point preferredLocation)
-		{
-			this.preferredLocation = preferredLocation;
-		}
-
-		@Override
-		public void setPreferredSize(Dimension preferredSize)
-		{
-			// The text component sizes itself to the spellbook name.
+			textGraphics.dispose();
 		}
 	}
 
@@ -113,24 +106,24 @@ public class SpellbookNameOverlay extends OverlayPanel
 			case 3:
 				return "Arceuus";
 			default:
-				return "Unknown";
+				return null;
 		}
 	}
 
-	private static Color getColor(int spellbook)
+	private Color getColor(int spellbook)
 	{
 		switch (spellbook)
 		{
 			case 0:
-				return new Color(196, 169, 132);
+				return config.standardNameColor();
 			case 1:
-				return new Color(169, 132, 196);
+				return config.ancientNameColor();
 			case 2:
-				return Color.WHITE;
+				return config.lunarNameColor();
 			case 3:
-				return Color.CYAN;
+				return config.arceuusNameColor();
 			default:
-				return Color.RED;
+				return Color.WHITE;
 		}
 	}
 }

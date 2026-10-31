@@ -2,21 +2,19 @@ package dev.spellbookindicator;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import net.runelite.api.gameval.SpriteID;
 import net.runelite.client.game.SpriteManager;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayMenuEntry;
-import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.LayoutableRenderableEntity;
 
 import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
 import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
 
-public class SpellbookIndicatorOverlay extends OverlayPanel
+public class SpellbookIndicatorOverlay extends Overlay
 {
 	private final SpellbookIndicatorConfig config;
 	private final SpellbookIndicatorPlugin plugin;
@@ -34,7 +32,10 @@ public class SpellbookIndicatorOverlay extends OverlayPanel
 		this.spriteManager = spriteManager;
 
 		setPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
+		setLayer(OverlayLayer.ABOVE_WIDGETS);
 		setMovable(true);
+		setResizable(true);
+		setMinimumSize(16);
 		getMenuEntries().add(new OverlayMenuEntry(
 			RUNELITE_OVERLAY_CONFIG,
 			OPTION_CONFIGURE,
@@ -44,7 +45,7 @@ public class SpellbookIndicatorOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!config.showIcon())
+		if (!config.iconVisibility().isVisible(plugin.isBankOpen()))
 		{
 			return null;
 		}
@@ -61,9 +62,13 @@ public class SpellbookIndicatorOverlay extends OverlayPanel
 			return null;
 		}
 
-		int size = config.iconSize();
-		panelComponent.getChildren().add(new SpellbookIconComponent(icon, size));
-		return super.render(graphics);
+		Dimension preferredSize = getPreferredSize();
+		int defaultSize = Math.max(getMinimumSize(), Math.min(40, config.legacyIconSize()));
+		int width = preferredSize == null ? defaultSize : Math.max(getMinimumSize(), preferredSize.width);
+		int height = preferredSize == null ? defaultSize : Math.max(getMinimumSize(), preferredSize.height);
+		int size = Math.min(width, height);
+		graphics.drawImage(icon, (width - size) / 2, (height - size) / 2, size, size, null);
+		return new Dimension(width, height);
 	}
 
 	private static int getSpriteId(int spellbook)
@@ -80,46 +85,6 @@ public class SpellbookIndicatorOverlay extends OverlayPanel
 				return SpriteID.SideiconsInterface.SPELLBOOK_ARCEUUS;
 			default:
 				return -1;
-		}
-	}
-
-	private static final class SpellbookIconComponent implements LayoutableRenderableEntity
-	{
-		private final BufferedImage icon;
-		private final int size;
-		private final Rectangle bounds = new Rectangle();
-		private Point preferredLocation = new Point();
-
-		private SpellbookIconComponent(BufferedImage icon, int size)
-		{
-			this.icon = icon;
-			this.size = size;
-		}
-
-		@Override
-		public Dimension render(Graphics2D graphics)
-		{
-			graphics.drawImage(icon, preferredLocation.x, preferredLocation.y, size, size, null);
-			bounds.setBounds(preferredLocation.x, preferredLocation.y, size, size);
-			return new Dimension(size, size);
-		}
-
-		@Override
-		public Rectangle getBounds()
-		{
-			return bounds;
-		}
-
-		@Override
-		public void setPreferredLocation(Point preferredLocation)
-		{
-			this.preferredLocation = preferredLocation;
-		}
-
-		@Override
-		public void setPreferredSize(Dimension preferredSize)
-		{
-			// The icon uses its configured size.
 		}
 	}
 }
