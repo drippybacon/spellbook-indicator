@@ -19,6 +19,8 @@ dependencies {
 	compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name: 'jshell', version: runeLiteVersion
+	testImplementation 'junit:junit:4.13.2'
+	testImplementation 'org.mockito:mockito-core:4.11.0'
 }
 
 group = 'dev.spellbookindicator'
@@ -27,6 +29,11 @@ version = '1.0.0'
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(11)
+}
+
+tasks.named('test') {
+	useJUnit()
+	systemProperty 'java.awt.headless', 'true'
 }
 
 tasks.named('jar') {

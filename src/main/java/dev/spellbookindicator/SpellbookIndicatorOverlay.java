@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2026, Spellbook Indicator contributors
- * Copyright (c) 2026, Interface Hotkey Guard contributors
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +45,7 @@ public class SpellbookIndicatorOverlay extends Overlay
 	private final SpriteManager spriteManager;
 
 	@Inject
-	private SpellbookIndicatorOverlay(
+	SpellbookIndicatorOverlay(
 		SpellbookIndicatorConfig config,
 		SpellbookIndicatorPlugin plugin,
 		SpriteManager spriteManager)

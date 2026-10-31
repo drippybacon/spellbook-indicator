@@ -27,7 +27,7 @@ Open **Spellbook Indicator** in RuneLite's plugin settings.
 
 The icon defaults to **Everywhere** and the name defaults to **Off**. Bank visibility follows the open bank interface; deposit boxes and the Grand Exchange do not count as the bank.
 
-The icon starts at **24 × 24 pixels** and can be resized down to **16 × 16 pixels**. Its initial size is preserved when upgrading from an older version. Older icon and name visibility preferences are also carried over unless a new visibility setting has already been chosen.
+The icon starts at **24 × 24 pixels** and can be resized down to **16 × 16 pixels**.
 
 ### Name colors
 
@@ -53,12 +53,12 @@ The icon and name can be positioned and resized separately. The name initially u
 
 Very small name boxes keep a readable minimum font size and shorten the name with `...` when needed. Text is clipped to the resized box, so switching spellbooks keeps its saved dimensions.
 
-## Scope
+## Tests
 
-The plugin displays spellbook status in standalone overlays. It does not cast spells, change game interfaces or their click targets, or make external network requests. Settings are stored through RuneLite's configuration system.
+Run `./gradlew test`, or `.\gradlew.bat test` on Windows.
+
+The tests cover visibility settings, spellbook mappings, bank detection, overlay lifecycle, settings migration, and rendering bounds. They use off-screen graphics and mocked RuneLite services, so they run without a game login.
 
 ## License
 
 [BSD 2-Clause](LICENSE).
-
-The existing Interface Hotkey Guard contributors notice is retained from the repository's original license.

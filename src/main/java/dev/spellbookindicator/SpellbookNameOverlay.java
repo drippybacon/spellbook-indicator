@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2026, Spellbook Indicator contributors
- * Copyright (c) 2026, Interface Hotkey Guard contributors
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +48,7 @@ public class SpellbookNameOverlay extends Overlay
 	private final SpellbookIndicatorPlugin plugin;
 
 	@Inject
-	private SpellbookNameOverlay(SpellbookIndicatorConfig config, SpellbookIndicatorPlugin plugin)
+	SpellbookNameOverlay(SpellbookIndicatorConfig config, SpellbookIndicatorPlugin plugin)
 	{
 		super(plugin);
 		this.config = config;
